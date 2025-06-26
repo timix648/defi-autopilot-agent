@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeFi AutoPilot Agent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .status-connected { background-color: #28a745 !important; }
+        .status-disconnected { background-color: #6c757d !important; }
+        .status-error { background-color: #dc3545 !important; }
+        #error-alert { z-index: 1000; }
+    </style>
+</head>
+<body>
+
+      <div id="error-alert" class="alert alert-danger d-none position-fixed top-0 start-50 translate-middle-x mt-3">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span id="error-message"></span>
+        <button type="button" class="btn-close" onclick="document.getElementById('error-alert').classList.add('d-none')"></button>
+    </div>
+
+    <div id="demo-banner" class="alert alert-info d-none text-center py-1 mb-0">
+        <i class="fas fa-vial me-2"></i>Demo Mode: All transactions are simulated
+    </div>
+    <div id="error-alert" class="alert alert-danger d-none position-fixed top-0 start-50 translate-middle-x mt-3">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span id="error-message"></span>
+        <button type="button" class="btn-close float-end" onclick="this.parentElement.classList.add('d-none')"></button>
+    </div>
+    
+    <div id="demo-banner" class="alert alert-info d-none text-center py-1 mb-0">
+        <i class="fas fa-vial me-2"></i>Demo Mode: All transactions are simulated
+    </div>
+
+    <div class="container py-4">
+        <header class="mb-4 border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="display-4 text-primary">
+                    <i class="fas fa-robot me-2"></i>DeFi AutoPilot
+                </h1>
+                <div class="d-flex align-items-center gap-3">
+                    <div id="connection-status" class="badge bg-secondary fs-6">
+                        <i class="fas fa-plug me-1"></i>Not Connected
+                    </div>
+                    <div class="badge bg-primary">
+                        <i class="fas fa-network-wired me-1"></i>Base Sepolia
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h5 mb-0">Agent Controls</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-3">
+                            <button id="connect-btn" class="btn btn-lg btn-outline-primary">
+                                <i class="fas fa-wallet me-2"></i>Connect Wallet
+                            </button>
+                            
+                            <button id="demo-btn" class="btn btn-lg btn-outline-info">
+                                <i class="fas fa-vial me-2"></i>Demo Mode
+                            </button>
+                            
+                            <div class="d-flex justify-content-between mt-3">
+                                <button id="toggle-btn" class="btn btn-lg btn-warning w-100 me-2">
+                                    <i class="fas fa-pause me-2"></i>Pause
+                                </button>
+                                <button id="execute-btn" class="btn btn-lg btn-success w-100">
+                                    <i class="fas fa-bolt me-2"></i>Run Now
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5 class="text-muted">Schedule</h5>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock fa-2x text-primary me-3"></i>
+                                <div>
+                                    <div>Next Execution: <span id="next-execution">--:--:--</span></div>
+                                    <div>Last Execution: <span id="last-execution">--:--:--</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h2 class="h5 mb-0">Portfolio Status</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h3 class="card-title text-primary">ETH Balance</h3>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fab fa-ethereum fa-3x me-3 text-muted"></i>
+                                            <div>
+                                                <h2 class="display-5" id="eth-balance">0.0000</h2>
+                                                <div class="text-muted">&asymp; $<span id="eth-value">0.00</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h3 class="card-title text-success">USDbC Balance</h3>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-coins fa-3x me-3 text-muted"></i>
+                                            <div>
+                                                <h2 class="display-5" id="usdbc-balance">0.00</h2>
+                                                <div class="text-muted">Stablecoin</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h5 class="text-muted">ETH Price</h5>
+                                <h4>$<span id="eth-price">0.00</span></h4>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <h5 class="text-muted">Portfolio Allocation</h5>
+                                <button class="btn btn-sm btn-outline-secondary" id="refresh-rebalance">
+                                    <i class="fas fa-sync"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="allocation-chart mb-3">
+                                <div class="d-flex" style="height: 24px; border-radius: 12px; overflow: hidden; background: #e9ecef;">
+                                    <div class="bg-primary d-flex justify-content-center align-items-center" 
+                                         id="eth-allocation" 
+                                         style="width: 50%;">
+                                        <span class="allocation-label text-white fw-bold">ETH</span>
+                                    </div>
+                                    <div class="bg-success d-flex justify-content-center align-items-center" 
+                                         id="usdbc-allocation" 
+                                         style="width: 50%;">
+                                        <span class="allocation-label text-white fw-bold">USDbC</span>
+                                    </div>
+                                </div>
+                                <div class="mt-2 text-center text-muted small">
+                                    Target: 50% ETH / 50% USDbC
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0">Transaction History</h2>
+                    <button id="clear-transactions" class="btn btn-sm btn-outline-light">
+                        <i class="fas fa-trash me-1"></i>Clear
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Time</th>
+                                <th>Transaction</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-list">
+                            <tr>
+                                <td colspan="4" class="text-center py-5">No transactions yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="walletModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Wallet Connected</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Wallet connected successfully!
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Agent Address:</label>
+                        <div class="input-group">
+                            <input type="text" id="agent-address" class="form-control" readonly>
+                            <button class="btn btn-outline-secondary" onclick="copyAddress()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="demo-switch">
+                        <label class="form-check-label" for="demo-switch">Demo Mode</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        const socket = io();
+        
+        socket.on('error', (msg) => {
+            document.getElementById('error-message').textContent = msg;
+            document.getElementById('error-alert').classList.remove('d-none');
+            setTimeout(() => {
+                document.getElementById('error-alert').classList.add('d-none');
+            }, 5000);
+        });
+
+        socket.on('update', (state) => {
+            document.getElementById('eth-balance').textContent = state.eth_balance.toFixed(4);
+            document.getElementById('usdbc-balance').textContent = state.token_balance.toFixed(2);
+            document.getElementById('eth-price').textContent = state.eth_price.toFixed(2);
+            document.getElementById('eth-value').textContent = (state.eth_balance * state.eth_price).toFixed(2);
+            
+            const statusEl = document.getElementById('connection-status');
+            if (state.agent_address) {
+                statusEl.innerHTML = '<i class="fas fa-wallet me-1"></i>Connected';
+                statusEl.classList.remove('status-disconnected', 'status-error');
+                statusEl.classList.add('status-connected');
+            } else {
+                statusEl.innerHTML = '<i class="fas fa-unlink me-1"></i>Disconnected';
+                statusEl.classList.remove('status-connected', 'status-error');
+                statusEl.classList.add('status-disconnected');
+            }
+
+            if (state.demo_mode) {
+                document.getElementById('demo-banner').classList.remove('d-none');
+            } else {
+                document.getElementById('demo-banner').classList.add('d-none');
+            }
+        });
+    </script>
+</body>
+</html>

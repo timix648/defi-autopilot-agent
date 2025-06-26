@@ -1,0 +1,108 @@
+:root {
+    --primary: #0d6efd;
+    --secondary: #6c757d;
+    --success: #198754;
+    --info: #0dcaf0;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --dark: #212529;
+    --light: #f8f9fa;
+}
+
+body {
+    background-color: #f5f9fc;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+#connection-status {
+    transition: all 0.3s ease;
+}
+
+.status-connected {
+    background-color: var(--success) !important;
+}
+
+.status-disconnected {
+    background-color: var(--secondary) !important;
+}
+
+.status-error {
+    background-color: var(--danger) !important;
+}
+
+.progress {
+    border-radius: 10px;
+    overflow: visible;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    position: relative;
+    overflow: visible;
+    font-weight: 500;
+}
+
+.progress-bar::after {
+    content: "";
+    position: absolute;
+    top: -5px;
+    right: 0;
+    width: 2px;
+    height: calc(100% + 10px);
+    background: rgba(255,255,255,0.5);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+#transaction-list tr:first-child td {
+    border-top: none;
+}
+
+.agent-running {
+    color: var(--success);
+    font-weight: bold;
+}
+
+.agent-paused {
+    color: var(--danger);
+    font-weight: bold;
+}
+
+.ethereum-icon {
+    color: #627eea;
+}
+
+.usdbc-icon {
+    color: #2775ca;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 12px;
+}
+
+.balance-card {
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
