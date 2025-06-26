@@ -3,3 +3,4 @@
 __pycache__/
 *.log
 .agent_address
+venv/
