@@ -32,3 +32,18 @@ BasePilot is an autonomous agent that manages your DeFi assets on Base chain:
 # Windows
 python -m venv venv
 venv\Scripts\activate
+# Mac/Linux
+python3 -m venv venv
+source venv/bin/activate
+
+### 2. Install Dependencies (Mandatory)
+```markdown
+```bash
+pip install -r requirements.txt
+
+### 3. Run Application (Mandatory)
+```markdown
+```bash
+python app.py
+python agent.py
+Access the dashboard at: http://localhost:5000
